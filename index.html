@@ -3,33 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analisador de Roleta - GOLDPRO</title>
+    <title>GOLDPRO - Analisador de Roleta</title>
     <style>
         /* Estilos CSS */
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f4f4f4;
-            color: #333;
+            /* Novo fundo: um cinza escuro suave */
+            background-color: #2c2c2c; /* Um cinza bem escuro */
+            color: #e0e0e0; /* Cor do texto geral para contrastar com o fundo escuro */
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            flex-direction: column; /* Para organizar o conteúdo em coluna */
+            justify-content: flex-start;
+            align-items: center;
             min-height: 100vh;
         }
 
         .container {
-            background-color: #fff;
+            background-color: #3a3a3a; /* Um pouco mais claro que o fundo do body */
             padding: 30px;
             border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             width: 100%;
             max-width: 1400px;
             box-sizing: border-box;
+            margin-bottom: 20px; /* Espaço entre o container principal e o histórico */
         }
 
-        h1, h2 {
-            color: #0056b3;
+        h1 {
+            /* Título GOLDPRO em dourado escuro */
+            color: #DAA520; /* Goldenrod - um dourado escuro */
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        h2 {
+            color: #DAA520; /* Dourado escuro para subtítulos */
             text-align: center;
             margin-bottom: 20px;
         }
@@ -38,15 +50,17 @@
             display: flex;
             gap: 30px;
             flex-wrap: wrap;
+            justify-content: center; /* Centraliza o conteúdo principal */
         }
 
         .history-section {
             flex: 1;
             min-width: 250px;
-            background-color: #e9ecef;
+            background-color: #4a4a4a; /* Fundo do histórico um pouco mais claro */
             padding: 20px;
             border-radius: 8px;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+            margin-top: 20px; /* Espaço acima do histórico quando ele estiver embaixo */
         }
 
         .add-number-control {
@@ -58,15 +72,17 @@
         #newNumberInput {
             flex-grow: 1;
             padding: 10px;
-            border: 1px solid #ccc;
+            border: 1px solid #5a5a5a; /* Borda mais escura */
             border-radius: 4px;
             font-size: 1em;
+            background-color: #3a3a3a; /* Fundo do input */
+            color: #e0e0e0; /* Texto do input */
         }
 
         #addNumberBtn {
             padding: 10px 15px;
-            background-color: #007bff;
-            color: white;
+            background-color: #DAA520; /* Dourado escuro */
+            color: #333; /* Texto escuro no botão dourado */
             border: none;
             border-radius: 4px;
             cursor: pointer;
@@ -75,21 +91,21 @@
         }
 
         #addNumberBtn:hover {
-            background-color: #0056b3;
+            background-color: #B8860B; /* Dourado um pouco mais escuro no hover */
         }
 
         .history-list {
             max-height: 500px;
             overflow-y: auto;
-            border: 1px solid #ddd;
+            border: 1px solid #5a5a5a; /* Borda mais escura */
             border-radius: 4px;
             padding: 10px;
-            background-color: #fff;
+            background-color: #3a3a3a; /* Fundo da lista do histórico */
         }
 
         .history-item {
             padding: 5px 0;
-            border-bottom: 1px dashed #eee;
+            border-bottom: 1px dashed #5a5a5a; /* Linha divisória mais escura */
             text-align: center;
             font-weight: bold;
             font-size: 1.1em;
@@ -100,9 +116,9 @@
         }
 
         /* Cores dos números da roleta */
-        .red { color: #dc3545; }
-        .black { color: #343a40; }
-        .green { color: #28a745; }
+        .red { color: #dc3545; } /* Vermelho padrão */
+        .black { color: #e0e0e0; } /* Preto da ro roleta agora é um cinza claro para contrastar com o fundo escuro */
+        .green { color: #28a745; } /* Verde padrão */
 
 
         .analysis-section {
@@ -117,32 +133,35 @@
         }
 
         .groups-table th, .groups-table td {
-            border: 1px solid #ddd;
+            border: 1px solid #5a5a5a; /* Borda da tabela mais escura */
             padding: 8px;
             text-align: center;
+            color: #e0e0e0; /* Texto da tabela */
         }
 
         .groups-table th {
-            background-color: #007bff;
-            color: white;
+            background-color: #DAA520; /* Dourado escuro para cabeçalho */
+            color: #333; /* Texto escuro no cabeçalho dourado */
             font-weight: bold;
         }
 
         .groups-table tbody tr:nth-child(even) {
-            background-color: #f2f2f2;
+            background-color: #4a4a4a; /* Fundo de linhas pares */
         }
 
         .groups-table tbody tr:hover {
-            background-color: #ddd;
+            background-color: #5a5a5a; /* Fundo no hover */
         }
 
         .group-number-input {
             width: 40px;
             padding: 5px;
-            border: 1px solid #ccc;
+            border: 1px solid #6a6a6a; /* Borda do input mais escura */
             border-radius: 3px;
             text-align: center;
             font-size: 0.9em;
+            background-color: #3a3a3a; /* Fundo do input */
+            color: #e0e0e0; /* Texto do input */
         }
 
         /* Estilos para as colunas de estatísticas */
@@ -155,37 +174,27 @@
 
         /* Estilo para a coluna de indicação */
         .groups-table td:last-child {
-            background-color: #ffeeba;
+            background-color: #5a5a5a; /* Fundo da célula de indicação */
         }
 
         .indication-positive {
-            background-color: #d4edda;
-            color: #155724;
+            background-color: #28a745; /* Verde para positivo */
+            color: #fff;
             font-weight: bold;
         }
 
         .indication-negative {
-            background-color: #f8d7da;
-            color: #721c24;
+            background-color: #dc3545; /* Vermelho para negativo */
+            color: #fff;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Analisador de Roleta</h1>
+        <h1>GOLDPRO</h1>
 
         <div class="main-content">
-            <div class="history-section">
-                <h2>Histórico de Números</h2>
-                <div class="add-number-control">
-                    <input type="number" id="newNumberInput" min="0" max="36" placeholder="Novo número (0-36)">
-                    <button id="addNumberBtn">Adicionar Número</button>
-                </div>
-                <div class="history-list" id="historyList">
-                    <!-- Números do histórico serão adicionados aqui -->
-                </div>
-            </div>
-
             <div class="analysis-section">
                 <h2>Grupos Configuráveis e Estatísticas</h2>
                 <table class="groups-table">
@@ -205,6 +214,18 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+    </div>
+
+    <!-- Histórico de Números movido para fora do container principal, para baixo -->
+    <div class="history-section">
+        <h2>Histórico de Números</h2>
+        <div class="add-number-control">
+            <input type="number" id="newNumberInput" min="0" max="36" placeholder="Novo número (0-36)">
+            <button id="addNumberBtn">Adicionar Número</button>
+        </div>
+        <div class="history-list" id="historyList">
+            <!-- Números do histórico serão adicionados aqui -->
         </div>
     </div>
 
@@ -350,33 +371,40 @@
                 let maxAtraso = 0;
                 let tempAtraso = 0;
 
+                // Calcula atraso atual e máxima de atraso
                 for (let j = 0; j < history.length; j++) {
                     const currentNumber = history[j];
                     const isGroupMember = groupNumbers.includes(currentNumber);
 
                     if (isGroupMember) {
                         timesOut++;
-                        tempAtraso = 0;
+                        tempAtraso = 0; // Reseta o atraso quando o grupo sai
                     } else {
                         tempAtraso++;
                     }
+                    
+                    // Atualiza a máxima de atraso
                     if (tempAtraso > maxAtraso) {
                         maxAtraso = tempAtraso;
                     }
+                    
+                    // O atraso atual é o atraso da primeira rodada (mais recente)
                     if (j === 0) {
                         currentAtraso = isGroupMember ? 0 : tempAtraso;
                     }
                 }
                 
+                // Ajuste para quando o grupo nunca saiu no histórico
                 if (timesOut === 0 && history.length > 0) {
                     currentAtraso = history.length;
-                    maxAtraso = history.length;
+                    maxAtraso = Math.max(maxAtraso, history.length); // Garante que a máxima de atraso reflita o histórico total
                 } else if (history.length === 0) {
                     currentAtraso = 0;
                     maxAtraso = 0;
                 }
                 
-                const totalRelevantNumbers = history.filter(num => num !== 0).length;
+                // Calcula a porcentagem
+                const totalRelevantNumbers = history.filter(num => num !== 0).length; // Exclui o 0 da contagem total para porcentagem
                 let percentage = 0;
                 if (totalRelevantNumbers > 0) {
                     percentage = (timesOut / totalRelevantNumbers) * 100;
@@ -388,13 +416,14 @@
                 document.getElementById(`group-${i + 1}-timesOut`).textContent = timesOut;
 
                 // Lógica de Indicação de Aposta
-                const INDICATION_PERIOD = 13;
-                const MIN_PERCENTAGE_ACTIVE = 25;
-                const ATRAZO_PROXIMITY_THRESHOLD = 0.8;
+                const INDICATION_PERIOD = 13; // Período das últimas rodadas para análise de atividade
+                const MIN_PERCENTAGE_ACTIVE = 25; // Porcentagem mínima para ser considerado "ativo"
+                const ATRAZO_PROXIMITY_THRESHOLD = 0.8; // Atraso atual deve ser 80% ou mais da máxima de atraso
 
                 let indicationText = 'Monitorar';
                 let indicationClass = '';
 
+                // Calcula a atividade do grupo nas últimas INDICATION_PERIOD rodadas
                 let recentHistory = history.slice(0, INDICATION_PERIOD);
                 let recentTimesOut = 0;
                 let recentRelevantNumbers = recentHistory.filter(num => num !== 0).length;
@@ -411,7 +440,7 @@
                 }
 
                 const isGroupActive = recentPercentage >= MIN_PERCENTAGE_ACTIVE;
-                const isAtrasoSignificant = currentAtraso > 0;
+                const isAtrasoSignificant = currentAtraso > 0; // O grupo está em atraso (não saiu na última rodada)
                 const isAtrasoNearMax = (maxAtraso > 0 && currentAtraso >= (maxAtraso * ATRAZO_PROXIMITY_THRESHOLD));
                 
                 if (isGroupActive && isAtrasoSignificant && isAtrasoNearMax) {
