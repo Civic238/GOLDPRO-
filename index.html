@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analisador de Roleta - GOLDPRO</title>
+    <style>
+        /* Estilos CSS */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 1400px;
+            box-sizing: border-box;
+        }
+
+        h1, h2 {
+            color: #0056b3;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .history-section {
+            flex: 1;
+            min-width: 250px;
+            background-color: #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .add-number-control {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        #newNumberInput {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        #addNumberBtn {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.2s;
+        }
+
+        #addNumberBtn:hover {
+            background-color: #0056b3;
+        }
+
+        .history-list {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            background-color: #fff;
+        }
+
+        .history-item {
+            padding: 5px 0;
+            border-bottom: 1px dashed #eee;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Cores dos números da roleta */
+        .red { color: #dc3545; }
+        .black { color: #343a40; }
+        .green { color: #28a745; }
+
+
+        .analysis-section {
+            flex: 3;
+            min-width: 800px;
+        }
+
+        .groups-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .groups-table th, .groups-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .groups-table th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+
+        .groups-table tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .groups-table tbody tr:hover {
+            background-color: #ddd;
+        }
+
+        .group-number-input {
+            width: 40px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        /* Estilos para as colunas de estatísticas */
+        .groups-table td:nth-child(8),
+        .groups-table td:nth-child(9),
+        .groups-table td:nth-child(10),
+        .groups-table td:nth-child(11) {
+            font-weight: bold;
+        }
+
+        /* Estilo para a coluna de indicação */
+        .groups-table td:last-child {
+            background-color: #ffeeba;
+        }
+
+        .indication-positive {
+            background-color: #d4edda;
+            color: #155724;
+            font-weight: bold;
+        }
+
+        .indication-negative {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Analisador de Roleta</h1>
+
+        <div class="main-content">
+            <div class="history-section">
+                <h2>Histórico de Números</h2>
+                <div class="add-number-control">
+                    <input type="number" id="newNumberInput" min="0" max="36" placeholder="Novo número (0-36)">
+                    <button id="addNumberBtn">Adicionar Número</button>
+                </div>
+                <div class="history-list" id="historyList">
+                    <!-- Números do histórico serão adicionados aqui -->
+                </div>
+            </div>
+
+            <div class="analysis-section">
+                <h2>Grupos Configuráveis e Estatísticas</h2>
+                <table class="groups-table">
+                    <thead>
+                        <tr>
+                            <th>Grupo</th>
+                            <th colspan="6">Números do Grupo</th>
+                            <th>Atual</th>
+                            <th>Percentual</th>
+                            <th>Máx</th>
+                            <th>Vezes</th>
+                            <th>Indicação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="groupsTableBody">
+                        <!-- Linhas dos grupos serão geradas aqui pelo JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lógica JavaScript
+
+        // 1. Mapeamento de Cores da Roleta
+        const rouletteColors = {
+            0: 'green',
+            1: 'red', 2: 'black', 3: 'red', 4: 'black', 5: 'red', 6: 'black',
+            7: 'red', 8: 'black', 9: 'red', 10: 'black', 11: 'black', 12: 'red',
+            13: 'black', 14: 'red', 15: 'black', 16: 'red', 17: 'black', 18: 'red',
+            19: 'red', 20: 'black', 21: 'red', 22: 'black', 23: 'red', 24: 'black',
+            25: 'red', 26: 'black', 27: 'red', 28: 'black', 29: 'black', 30: 'red',
+            31: 'black', 32: 'red', 33: 'black', 34: 'red', 35: 'black', 36: 'red'
+        };
+
+        // Função para obter a cor de um número
+        function getNumberColor(number) {
+            return rouletteColors[number] || '';
+        }
+
+        // Variável global para armazenar o histórico de números
+        let history = [];
+
+        // Referências aos elementos HTML
+        const newNumberInput = document.getElementById('newNumberInput');
+        const addNumberBtn = document.getElementById('addNumberBtn');
+        const historyList = document.getElementById('historyList');
+        const groupsTableBody = document.getElementById('groupsTableBody');
+
+        // 2. Gerenciamento do Histórico de Números
+        function addNumberToHistory() {
+            const number = parseInt(newNumberInput.value);
+
+            if (isNaN(number) || number < 0 || number > 36) {
+                alert('Por favor, insira um número válido entre 0 e 36.');
+                newNumberInput.value = '';
+                return;
+            }
+
+            history.unshift(number);
+
+            // Limita o histórico para não ficar muito grande (ex: últimos 500 números)
+            if (history.length > 500) {
+                history.pop();
+            }
+
+            renderHistory();
+            updateAllStats();
+
+            newNumberInput.value = '';
+            newNumberInput.focus();
+        }
+
+        // Renderiza o histórico na interface
+        function renderHistory() {
+            historyList.innerHTML = '';
+            history.forEach(num => {
+                const div = document.createElement('div');
+                div.classList.add('history-item', getNumberColor(num));
+                div.textContent = num;
+                historyList.appendChild(div);
+            });
+        }
+
+        // Event Listener para o botão de adicionar número
+        addNumberBtn.addEventListener('click', addNumberToHistory);
+
+        // Permite adicionar número pressionando Enter no input
+        newNumberInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                addNumberToHistory();
+            }
+        });
+
+        // 3. Geração Inicial da Tabela de Grupos Configuráveis
+        const NUM_GROUPS = 9;
+        const NUM_SLOTS_PER_GROUP = 6;
+
+        function initializeGroupsTable() {
+            for (let i = 0; i < NUM_GROUPS; i++) {
+                const row = groupsTableBody.insertRow();
+                
+                const groupNumCell = row.insertCell();
+                groupNumCell.textContent = i + 1;
+
+                for (let j = 0; j < NUM_SLOTS_PER_GROUP; j++) {
+                    const numInputCell = row.insertCell();
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.min = '0';
+                    input.max = '36';
+                    input.classList.add('group-number-input');
+                    input.placeholder = '-';
+                    input.dataset.groupIndex = i;
+                    input.dataset.slotIndex = j;
+                    
+                    input.addEventListener('change', updateAllStats);
+                    
+                    numInputCell.appendChild(input);
+                }
+
+                const statsCells = ['currentAtraso', 'percentage', 'maxAtraso', 'timesOut', 'indication'];
+                statsCells.forEach(id => {
+                    const cell = row.insertCell();
+                    cell.id = `group-${i + 1}-${id}`;
+                    cell.textContent = '-';
+                });
+            }
+        }
+
+        // 4. Função para obter os números de um grupo
+        function getGroupNumbers(groupIndex) {
+            const inputs = document.querySelectorAll(`input[data-group-index="${groupIndex}"]`);
+            const numbers = [];
+            inputs.forEach(input => {
+                const num = parseInt(input.value);
+                if (!isNaN(num) && num >= 0 && num <= 36) {
+                    numbers.push(num);
+                }
+            });
+            return numbers;
+        }
+
+        // Função principal para atualizar todas as estatísticas
+        function updateAllStats() {
+            for (let i = 0; i < NUM_GROUPS; i++) {
+                const groupNumbers = getGroupNumbers(i);
+
+                if (groupNumbers.length === 0) {
+                    document.getElementById(`group-${i + 1}-currentAtraso`).textContent = '-';
+                    document.getElementById(`group-${i + 1}-percentage`).textContent = '-';
+                    document.getElementById(`group-${i + 1}-maxAtraso`).textContent = '-';
+                    document.getElementById(`group-${i + 1}-timesOut`).textContent = '-';
+                    document.getElementById(`group-${i + 1}-indication`).textContent = '-';
+                    document.getElementById(`group-${i + 1}-indication`).className = '';
+                    continue;
+                }
+
+                let timesOut = 0;
+                let currentAtraso = 0;
+                let maxAtraso = 0;
+                let tempAtraso = 0;
+
+                for (let j = 0; j < history.length; j++) {
+                    const currentNumber = history[j];
+                    const isGroupMember = groupNumbers.includes(currentNumber);
+
+                    if (isGroupMember) {
+                        timesOut++;
+                        tempAtraso = 0;
+                    } else {
+                        tempAtraso++;
+                    }
+                    if (tempAtraso > maxAtraso) {
+                        maxAtraso = tempAtraso;
+                    }
+                    if (j === 0) {
+                        currentAtraso = isGroupMember ? 0 : tempAtraso;
+                    }
+                }
+                
+                if (timesOut === 0 && history.length > 0) {
+                    currentAtraso = history.length;
+                    maxAtraso = history.length;
+                } else if (history.length === 0) {
+                    currentAtraso = 0;
+                    maxAtraso = 0;
+                }
+                
+                const totalRelevantNumbers = history.filter(num => num !== 0).length;
+                let percentage = 0;
+                if (totalRelevantNumbers > 0) {
+                    percentage = (timesOut / totalRelevantNumbers) * 100;
+                }
+
+                document.getElementById(`group-${i + 1}-currentAtraso`).textContent = currentAtraso;
+                document.getElementById(`group-${i + 1}-percentage`).textContent = percentage.toFixed(2) + '%';
+                document.getElementById(`group-${i + 1}-maxAtraso`).textContent = maxAtraso;
+                document.getElementById(`group-${i + 1}-timesOut`).textContent = timesOut;
+
+                // Lógica de Indicação de Aposta
+                const INDICATION_PERIOD = 13;
+                const MIN_PERCENTAGE_ACTIVE = 25;
+                const ATRAZO_PROXIMITY_THRESHOLD = 0.8;
+
+                let indicationText = 'Monitorar';
+                let indicationClass = '';
+
+                let recentHistory = history.slice(0, INDICATION_PERIOD);
+                let recentTimesOut = 0;
+                let recentRelevantNumbers = recentHistory.filter(num => num !== 0).length;
+
+                recentHistory.forEach(num => {
+                    if (groupNumbers.includes(num)) {
+                        recentTimesOut++;
+                    }
+                });
+
+                let recentPercentage = 0;
+                if (recentRelevantNumbers > 0) {
+                    recentPercentage = (recentTimesOut / recentRelevantNumbers) * 100;
+                }
+
+                const isGroupActive = recentPercentage >= MIN_PERCENTAGE_ACTIVE;
+                const isAtrasoSignificant = currentAtraso > 0;
+                const isAtrasoNearMax = (maxAtraso > 0 && currentAtraso >= (maxAtraso * ATRAZO_PROXIMITY_THRESHOLD));
+                
+                if (isGroupActive && isAtrasoSignificant && isAtrasoNearMax) {
+                    indicationText = 'APOSTAR!';
+                    indicationClass = 'indication-positive';
+                } else if (isGroupActive && isAtrasoSignificant) {
+                    indicationText = 'Ativo/Atraso';
+                    indicationClass = '';
+                } else if (isGroupActive) {
+                    indicationText = 'Ativo';
+                    indicationClass = '';
+                } else if (timesOut === 0 && history.length >= INDICATION_PERIOD) {
+                    indicationText = 'Frio';
+                    indicationClass = 'indication-negative';
+                }
+
+                const indicationCell = document.getElementById(`group-${i + 1}-indication`);
+                indicationCell.textContent = indicationText;
+                indicationCell.className = indicationClass;
+            }
+        }
+
+        // Inicializa a tabela de grupos e as estatísticas quando a página carrega
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeGroupsTable();
+            updateAllStats();
+        });
+    </script>
+</body>
+</html>
